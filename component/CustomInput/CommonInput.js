@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, } from 'rea
 import React, { useState, useEffect } from 'react'
 import { Colors_Name } from '../../util/color/Color'
 
-const CommonInput = ({ placeholder, keyboardType, leftIcon, rightIcon, rightIconClick, onChangeText, onFocus, secureTextEntry, inputName }) => {
+const CommonInput = ({ placeholder, keyboardType, leftIcon, rightIcon, rightIconClick, onChangeText, onFocus, secureTextEntry, inputName, multiline }) => {
     return (
 
         <View>
@@ -22,6 +22,7 @@ const CommonInput = ({ placeholder, keyboardType, leftIcon, rightIcon, rightIcon
                         onChangeText={onChangeText}
                         onFocus={onFocus}
                         secureTextEntry={secureTextEntry}
+                        multiline={multiline}
                     />
                     <TouchableOpacity onPress={() => {
                         rightIconClick()

@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         height: 40,
         backgroundColor: Colors_Name.red,
+        marginBottom: 30,
     },
     login_Button: {
         color: Colors_Name.white,
