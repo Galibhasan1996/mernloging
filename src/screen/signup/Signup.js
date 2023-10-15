@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react'
 import CommonInput from '../../../component/CustomInput/CommonInput'
 import { Colors_Name } from '../../../util/color/Color'
 import CommonButton from '../../../component/CommonButton/CommonButton'
-import { signup } from '../../../BackendURL/URL'
+import { signup, verify } from '../../../BackendURL/URL'
+import CustomModel from '../../../component/modal/CustomModel'
 
 
 
@@ -12,14 +13,14 @@ const Signup = ({ navigation }) => {
     const [fdata, setfdata] = useState({
         name: "",
         email: "",
-        dateofbirth: "",
+        dob: "",
         password: "",
         confirmpassword: "",
         address: ""
     })
 
     const [errormsg, seterrormsg] = useState('')
-
+    const [indicator, setindicator] = useState(false)
     const [Focusname, setFocusname] = useState(false)
     const [FocusEmail, setFocusEmail] = useState(false)
     const [Focusdateofbirth, setFocusdateofbirth] = useState(false)
@@ -30,19 +31,33 @@ const Signup = ({ navigation }) => {
     const [secureTextEntry, setsecureTextEntry] = useState(true)
     const [secureTextEntry1, setsecureTextEntry1] = useState(true)
 
-
     const sendToBackend = () => {
         if (
             fdata.name === ""
-            && fdata.email === ""
-            && fdata.dateofbirth === ""
-            && fdata.password === ""
-            && fdata.confirmpassword === ""
-            && fdata.address === ""
         ) {
-            seterrormsg("All fields are required")
+            seterrormsg("enter your name")
+            return
+        } else if (fdata.email === "") {
+            seterrormsg("Enter your email")
             return
         }
+        else if (fdata.dob === "") {
+            seterrormsg("Enter your dob")
+            return
+        }
+        else if (fdata.password === "") {
+            seterrormsg("Enter your password")
+            return
+        }
+        else if (fdata.confirmpassword === "") {
+            seterrormsg("Enter your confirm password")
+            return
+        }
+        else if (fdata.address === "") {
+            seterrormsg("Enter your address")
+            return
+        }
+
         else if (fdata.password !== fdata.confirmpassword) {
             seterrormsg("Password and Confirm Password must be the same")
             return
@@ -54,13 +69,46 @@ const Signup = ({ navigation }) => {
 
         }
         else {
-            fetch(signup, {
+            // console.log(fdata);
+            setindicator(true)
+            fetch(verify, {
                 method: 'POST',
-                'content-type': 'application/json',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(fdata)
             })
+                .then((res) => res.json())
+                .then((data) => {
+                    // console.log(data);
+                    if (data.error) {
+                        seterrormsg(data.error);
+                    }
+                    else if (data.message == "Verification Code Sent to your Email") {
+                        // console.log(data.userdata);
+                        Alert.alert(data.message)
+                        resetFormData();
+                        setindicator(false);
+                        navigation.navigate('CodeVarifiction', { userdata: data.userdata })
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
         }
     }
 
+
+    const resetFormData = () => {
+        setfdata({
+            name: "",
+            email: "",
+            dob: "",
+            password: "",
+            confirmpassword: "",
+            address: ""
+        });
+    };
 
 
 
@@ -111,6 +159,7 @@ const Signup = ({ navigation }) => {
 
                         }}
                         inputName={'Name'}
+                        value={fdata.name}
                     />
 
                     <CommonInput
@@ -128,13 +177,14 @@ const Signup = ({ navigation }) => {
 
                         }}
                         inputName={'Email'}
+                        value={fdata.email}
                     />
 
                     <CommonInput
                         placeholder={'Enter your date of birth'}
-                        keyboardType={'number-pad'}
+                        keyboardType={'default'}
                         leftIcon={Focusdateofbirth == true ? require('../../image/dobfill.png') : require('../../image/dobb.png')}
-                        onChangeText={(t) => { setfdata({ ...fdata, dateofbirth: t }) }}
+                        onChangeText={(t) => { setfdata({ ...fdata, dob: t }) }}
                         onFocus={() => {
                             setFocusname(false)
                             setFocusEmail(false);
@@ -146,6 +196,7 @@ const Signup = ({ navigation }) => {
 
                         }}
                         inputName={'DOB'}
+                        value={fdata.dob}
                     />
 
                     <CommonInput
@@ -167,6 +218,7 @@ const Signup = ({ navigation }) => {
                         }}
                         secureTextEntry={secureTextEntry}
                         inputName={'Password'}
+                        value={fdata.password}
                     />
 
                     <CommonInput
@@ -188,6 +240,7 @@ const Signup = ({ navigation }) => {
                         }}
                         secureTextEntry={secureTextEntry1}
                         inputName={'Confirm Password'}
+                        value={fdata.confirmpassword}
                     />
 
                     <CommonInput
@@ -206,8 +259,9 @@ const Signup = ({ navigation }) => {
 
                         }}
                         multiline={true}
+                        value={fdata.address}
                     />
-
+                    <CustomModel indicator={indicator} setindicator={setindicator}></CustomModel>
 
                     <CommonButton title={'Signup'}
                         onClick={() => { sendToBackend() }}
@@ -284,6 +338,12 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         textTransform: "uppercase",
         fontWeight: "900"
+    },
+    indicator_container: {
+        position: 'absolute',
+        alignSelf: 'center',
+        marginTop: 200,
+
     }
 })
 

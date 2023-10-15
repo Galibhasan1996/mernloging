@@ -2,7 +2,9 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, } from 'rea
 import React, { useState, useEffect } from 'react'
 import { Colors_Name } from '../../util/color/Color'
 
-const CommonInput = ({ placeholder, keyboardType, leftIcon, rightIcon, rightIconClick, onChangeText, onFocus, secureTextEntry, inputName, multiline }) => {
+
+
+const CommonInput = ({ placeholder, keyboardType, leftIcon, rightIcon, rightIconClick, onChangeText, onFocus, secureTextEntry, inputName, multiline, value, onPressIn }) => {
     return (
 
         <View>
@@ -13,7 +15,9 @@ const CommonInput = ({ placeholder, keyboardType, leftIcon, rightIcon, rightIcon
 
                 <View style={styles.image_contianer}>
                     <View>
-                        <Image source={leftIcon} style={styles.pass_image} />
+                        {
+                            leftIcon && <Image source={leftIcon} style={styles.pass_image} />
+                        }
                     </View>
 
                     <TextInput placeholder={placeholder}
@@ -23,12 +27,17 @@ const CommonInput = ({ placeholder, keyboardType, leftIcon, rightIcon, rightIcon
                         onFocus={onFocus}
                         secureTextEntry={secureTextEntry}
                         multiline={multiline}
+                        value={value}
+                        onPressIn={onPressIn}
                     />
-                    <TouchableOpacity onPress={() => {
-                        rightIconClick()
-                    }}>
-                        <Image source={rightIcon} style={styles.right_image} />
-                    </TouchableOpacity>
+                    {
+                        rightIcon &&
+                        <TouchableOpacity onPress={() => {
+                            rightIconClick()
+                        }}>
+                            <Image source={rightIcon} style={styles.right_image} />
+                        </TouchableOpacity>
+                    }
                 </View>
 
             </View>

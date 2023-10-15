@@ -3,17 +3,76 @@ import React, { useState, useEffect } from 'react'
 import CommonInput from '../../../component/CustomInput/CommonInput'
 import { Colors_Name } from '../../../util/color/Color'
 import CommonButton from '../../../component/CommonButton/CommonButton'
+import { signin } from '../../../BackendURL/URL'
+
+
 
 const Login = ({ navigation }) => {
     const [email, setemail] = useState('')
     const [password, setpassword] = useState('')
+    const [errormsg, seterrormsg] = useState('')
+
     const [FocusEmail, setFocusEmail] = useState(false)
     const [FocusPassword, setFocusPassword] = useState(false)
     const [secureTextEntry, setsecureTextEntry] = useState(true)
 
+
+    const Login_to_by_backend = () => {
+        if (email == '') {
+            seterrormsg('Enter your email address')
+            return
+        }
+        else if (password == '') {
+            seterrormsg('Enter your password')
+            return
+        }
+        else {
+            fetch(signin, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({ email: email, password: password })
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    // console.log(data);
+                    if (data.error) {
+                        seterrormsg(data.error);
+                    }
+                    else {
+                        seterrormsg('')
+                        setemail('')
+                        setpassword("")
+                        Alert.alert("Log in Successfully")
+                        navigation.navigate("Home")
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        }
+    }
+
+
+
+
+
+
     return (
         <View style={styles.container}>
             <View style={styles.inside_container}>
+
+                {/* Error message show  */}
+                {
+                    errormsg === "" ? null
+                        :
+                        <View style={styles.err_meessage_container}>
+                            <Text style={styles.err_message}>{errormsg}</Text>
+                        </View>
+
+                }
+
                 <Text style={styles.login_heador}>Login</Text>
                 <Text style={styles.login_bottom_text}>Sign in to continue</Text>
 
@@ -24,8 +83,10 @@ const Login = ({ navigation }) => {
                     onFocus={() => {
                         setFocusEmail(true);
                         setFocusPassword(false)
+                        seterrormsg("")
                     }}
                     inputName={'Email'}
+                    value={email}
                 />
 
                 <CommonInput
@@ -38,9 +99,11 @@ const Login = ({ navigation }) => {
                     onFocus={() => {
                         setFocusEmail(false);
                         setFocusPassword(true)
+                        seterrormsg("")
                     }}
                     secureTextEntry={secureTextEntry}
                     inputName={'Password'}
+                    value={password}
                 />
                 <TouchableOpacity style={styles.forgot_password_container} onPress={() => {
                     navigation.navigate('Forgot')
@@ -49,7 +112,7 @@ const Login = ({ navigation }) => {
                 </TouchableOpacity>
 
                 <CommonButton title={'Log in'}
-                    onClick={() => { Alert.alert('Clicked') }}
+                    onClick={() => { Login_to_by_backend() }}
                 />
 
                 <View style={styles.new_account_container}>
@@ -113,5 +176,22 @@ const styles = StyleSheet.create({
     new: {
         color: Colors_Name.red,
         marginLeft: 10,
+    },
+    err_meessage_container: {
+        width: '95%',
+        backgroundColor: Colors_Name.red,
+        alignSelf: 'center',
+        borderRadius: 10,
+        marginTop: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 10,
+        elevation: 5,
+    },
+    err_message: {
+        color: Colors_Name.white,
+        paddingVertical: 10,
+        textTransform: "uppercase",
+        fontWeight: "900"
     }
 })
